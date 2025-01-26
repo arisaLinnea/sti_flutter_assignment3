@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -49,18 +50,18 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBkIdgqj2PCc_9NmpgXUKRJeMRGJbwOafU',
-    appId: '1:1023845201625:web:ff822dcdaba439573ff0c8',
+  static FirebaseOptions web = FirebaseOptions(
+    apiKey: dotenv.env['WEB_API_KEY'] ?? '',
+    appId: dotenv.env['WEB_APP_ID'] ?? '',
     messagingSenderId: '1023845201625',
     projectId: 'sti-parking',
     authDomain: 'sti-parking.firebaseapp.com',
     storageBucket: 'sti-parking.firebasestorage.app',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCJ84K7txY1ei-Vyta8GvkNE3gNylRqTnY',
-    appId: '1:1023845201625:ios:c26aa3201807e8333ff0c8',
+  static FirebaseOptions ios = FirebaseOptions(
+    apiKey: dotenv.env['IOS_API_KEY'] ?? '',
+    appId: dotenv.env['IOS_APP_ID'] ?? '',
     messagingSenderId: '1023845201625',
     projectId: 'sti-parking',
     storageBucket: 'sti-parking.firebasestorage.app',

@@ -10,8 +10,10 @@ import 'package:parking_admin/style/theme.dart';
 import 'package:parking_admin/views/login_view.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_client/shared_client.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
+  await dotenv.load(fileName: "../.env");
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(

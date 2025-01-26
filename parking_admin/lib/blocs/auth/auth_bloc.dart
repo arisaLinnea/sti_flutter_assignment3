@@ -14,7 +14,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await _handleLogoutToState(emit);
         }
       } catch (e) {
-        print('catch error: ${e.toString()}');
         emit(AuthUnauthorizedState());
       }
     });
@@ -30,13 +29,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthAuthenticatedState());
     } catch (e) {
       emit(AuthFailedState(message: 'Login Failed'));
-      print('catch admin error: ${e.toString()}');
       emit(AuthUnauthorizedState());
     }
   }
 
   Future<void> _handleLogoutToState(Emitter<AuthState> emit) async {
-    print('logout admin: ');
     emit(AuthUnauthorizedState());
   }
 }

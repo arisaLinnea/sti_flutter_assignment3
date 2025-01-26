@@ -40,31 +40,40 @@ MultiRepositoryProvider(
             child: const MyApp())),
   );
   */
-  runApp(MultiBlocProvider(
+  runApp(MultiRepositoryProvider(
       providers: [
-        BlocProvider(
-            create: (context) => AuthBloc(
-                userLoginRepository: UserLoginRepository(),
-                ownerRepository: OwnerRepository())),
-        BlocProvider(
-            create: (context) => UserRegBloc(
-                userLoginRepository: UserLoginRepository(),
-                ownerRepository: OwnerRepository())),
-        BlocProvider(
-            create: (context) => VehicleBloc(
-                vehicleRepository: VehicleRepository(),
-                authBloc: context.read<AuthBloc>())),
-        BlocProvider(
-            create: (context) =>
-                ParkingLotBloc(parkingLotRepository: ParkingLotRepository())),
-        BlocProvider(
-            create: (context) =>
-                ParkingBloc(parkingRepository: ParkingRepository())),
+        RepositoryProvider<UserLoginRepository>(
+          create: (context) => UserLoginRepository(),
+        ),
+        RepositoryProvider<OwnerRepository>(
+          create: (context) => OwnerRepository(),
+        ),
       ],
-      child: ChangeNotifierProvider<ThemeNotifier>(
-        create: (_) => ThemeNotifier(),
-        child: const FindMeASpot(),
-      )));
+      child: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+                create: (context) => AuthBloc(
+                    userLoginRepository: context.read<UserLoginRepository>(),
+                    ownerRepository: context.read<OwnerRepository>())),
+            BlocProvider(
+                create: (context) => UserRegBloc(
+                    userLoginRepository: context.read<UserLoginRepository>(),
+                    ownerRepository: context.read<OwnerRepository>())),
+            // BlocProvider(
+            //     create: (context) => VehicleBloc(
+            //         vehicleRepository: VehicleRepository(),
+            //         authBloc: context.read<AuthBloc>())),
+            // BlocProvider(
+            //     create: (context) => ParkingLotBloc(
+            //         parkingLotRepository: ParkingLotRepository())),
+            // BlocProvider(
+            //     create: (context) =>
+            //         ParkingBloc(parkingRepository: ParkingRepository())),
+          ],
+          child: ChangeNotifierProvider<ThemeNotifier>(
+            create: (_) => ThemeNotifier(),
+            child: const FindMeASpot(),
+          ))));
 }
 
 class FindMeASpot extends StatelessWidget {
@@ -124,17 +133,44 @@ class UserView extends StatefulWidget {
 class _UserViewState extends State<UserView> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeNotifier>(
-      builder: (context, themeNotifier, child) {
-        return MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          routerConfig: router,
-          title: 'Find Me A Spot',
-          theme: lightTheme,
-          darkTheme: darkTheme,
-          themeMode: themeNotifier.themeMode,
-        );
-      },
-    );
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+              create: (context) => VehicleBloc(
+                  vehicleRepository: VehicleRepository(),
+                  authBloc: context.read<AuthBloc>())),
+          BlocProvider(
+              create: (context) =>
+                  ParkingLotBloc(parkingLotRepository: ParkingLotRepository())),
+          BlocProvider(
+              create: (context) =>
+                  ParkingBloc(parkingRepository: ParkingRepository())),
+        ],
+        child: Consumer<ThemeNotifier>(
+          builder: (context, themeNotifier, child) {
+            return MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              routerConfig: router,
+              title: 'Find Me A Spot',
+              theme: lightTheme,
+              darkTheme: darkTheme,
+              themeMode: themeNotifier.themeMode,
+            );
+          },
+        ));
   }
+  // Widget build(BuildContext context) {
+  //   return Consumer<ThemeNotifier>(
+  //     builder: (context, themeNotifier, child) {
+  //       return MaterialApp.router(
+  //         debugShowCheckedModeBanner: false,
+  //         routerConfig: router,
+  //         title: 'Find Me A Spot',
+  //         theme: lightTheme,
+  //         darkTheme: darkTheme,
+  //         themeMode: themeNotifier.themeMode,
+  //       );
+  //     },
+  //   );
+  // }
 }

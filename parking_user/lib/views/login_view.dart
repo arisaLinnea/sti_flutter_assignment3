@@ -30,9 +30,8 @@ class LoginView extends StatelessWidget {
           if (authState is AuthAuthenticatedState) {
             Utils.toastMessage('Login Successful');
           }
-
           if (authState is AuthFailedState) {
-            Utils.toastMessage('Login Failed');
+            Utils.toastMessage('Login Failed: ${authState.message}', time: 2);
           }
         },
         child: Center(

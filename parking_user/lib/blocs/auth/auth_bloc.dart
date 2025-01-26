@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_user/utils/utils.dart';
 import 'package:shared_client/shared_client.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -21,7 +22,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await _handleLogoutToState(emit);
         }
       } catch (e) {
-        print('catch error: ${e.toString()}');
+        if (e is FirebaseAuthException) {
+          emit(AuthFailedState(
+              message: e.message ?? 'An unknown error occurred'));
+        } else {
+          emit(AuthFailedState(message: 'An unknown error occurred'));
+        }
         emit(AuthUnauthorizedState());
       }
     });

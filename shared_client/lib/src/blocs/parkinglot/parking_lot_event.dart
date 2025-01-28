@@ -2,6 +2,10 @@ part of 'parking_lot_bloc.dart';
 
 class ParkingLotEvent {}
 
+class SubscribeToParkingLots extends ParkingLotEvent {
+  SubscribeToParkingLots();
+}
+
 class LoadParkingLotsEvent extends ParkingLotEvent {}
 
 class RemoveParkingLotEvent extends ParkingLotEvent {

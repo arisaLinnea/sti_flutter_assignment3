@@ -19,7 +19,7 @@ class ParkingWidget extends StatelessWidget {
         subtitle:
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('Space: ${item.parkinglot?.address?.toString()}'),
-          Text('Cost: ${item.parkinglot?.hourlyPrice}'),
+          Text('Cost: ${item.parkinglot?.hourlyPrice.toStringAsFixed(1)}'),
           Text(
               'Car: ${item.vehicle?.type.name}  ${item.vehicle?.registrationNo}'),
           Text('Owner: ${item.vehicle?.owner?.name}'),

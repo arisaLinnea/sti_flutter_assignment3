@@ -10,8 +10,17 @@ class ParkingRepository extends Repository<Parking> {
   factory ParkingRepository() => _instance;
 
   @override
-  Parking deserialize(Map<String, dynamic> json) => Parking.fromJson(json);
+  Future<Parking> deserialize(Map<String, dynamic> json) async =>
+      await Parking.fromJsonAsync(json);
 
   @override
   Map<String, dynamic> serialize(Parking item) => item.toJson();
+
+  Stream<List<Parking>> parkingStream() {
+    return db.collection(path).snapshots().asyncMap((snapshot) async {
+      final futures =
+          snapshot.docs.map((doc) => Parking.fromJsonAsync(doc.data()));
+      return Future.wait(futures);
+    });
+  }
 }

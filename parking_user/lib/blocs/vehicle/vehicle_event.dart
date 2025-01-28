@@ -2,6 +2,12 @@ part of 'vehicle_bloc.dart';
 
 class VehicleEvent {}
 
+class SubscribeToUserVehicles extends VehicleEvent {
+  final String userId;
+
+  SubscribeToUserVehicles({required this.userId});
+}
+
 class LoadVehiclesEvent extends VehicleEvent {
   LoadVehiclesEvent();
 }

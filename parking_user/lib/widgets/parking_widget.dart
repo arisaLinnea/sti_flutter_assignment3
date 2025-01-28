@@ -26,7 +26,8 @@ class ParkingWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text('Address: ${item.parkinglot?.address.toString()}'),
-              Text('Hourly price: ${item.parkinglot?.hourlyPrice}'),
+              Text(
+                  'Hourly price: ${item.parkinglot?.hourlyPrice.toStringAsFixed(1)}'),
               Text(
                   'Car: ${item.vehicle?.registrationNo} (${item.vehicle?.type.name})'),
               Text('Start time: ${item.startTime.parkingFormat()}'),

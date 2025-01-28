@@ -13,7 +13,7 @@ abstract class Repository<T extends Identifiable> {
   Repository({required String path}) : _path = path;
 
   Map<String, dynamic> serialize(T item);
-  T deserialize(Map<String, dynamic> json);
+  Future<T> deserialize(Map<String, dynamic> json);
 
   Future<String?> addToList({required T item}) async {
     await db.collection(_path).doc(item.id).set(serialize(item));
@@ -22,10 +22,11 @@ abstract class Repository<T extends Identifiable> {
 
   Future<List<T>> getList() async {
     final snapshot = await db.collection(_path).get();
-
     final jsons = snapshot.docs.map((doc) => doc.data()).toList();
 
-    return jsons.map((item) => deserialize(item)).toList();
+    final items =
+        await Future.wait(jsons.map((item) async => await deserialize(item)));
+    return items;
   }
 
   Future<T> getElementById({required String id}) async {

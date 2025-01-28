@@ -21,3 +21,7 @@ class EditParkingEvent extends ParkingEvent {
 
   EditParkingEvent({required this.parking});
 }
+
+class SubscribeToParkings extends ParkingEvent {
+  SubscribeToParkings();
+}

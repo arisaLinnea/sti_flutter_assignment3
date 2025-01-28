@@ -14,12 +14,6 @@ class ParkingLotView extends StatefulWidget {
 
 class _ParkingLotViewState extends State<ParkingLotView> {
   @override
-  void initState() {
-    super.initState();
-    context.read<ParkingLotBloc>().add(LoadParkingLotsEvent());
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

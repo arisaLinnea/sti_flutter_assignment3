@@ -23,6 +23,13 @@ class Address {
         zipCode: json['zipCode'],
         city: json['city']);
   }
+  static Future<Address> fromJsonAsync(Map<String, dynamic> json) async {
+    return Address(
+        id: json['id'],
+        street: json['street'],
+        zipCode: json['zipCode'],
+        city: json['city']);
+  }
 
   Map<String, dynamic> toJson() =>
       {'id': _id, 'street': street, 'zipCode': zipCode, 'city': city};
@@ -57,7 +64,7 @@ class ParkingLot implements Identifiable {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! ParkingLot) return false;
-    return other.id == _id; // Compare based on the 'id' field
+    return other.id == _id;
   }
 
   @override
@@ -69,6 +76,17 @@ class ParkingLot implements Identifiable {
         address:
             json['address'] != null ? Address.fromJson(json['address']) : null,
         hourlyPrice: json['hourlyPrice']);
+  }
+
+  static Future<ParkingLot> fromJsonAsync(Map<String, dynamic> json) async {
+    Address? address = json['address'] != null
+        ? await Address.fromJsonAsync(json['address'])
+        : null;
+
+    ParkingLot parking = ParkingLot(
+        id: json['id'], address: address, hourlyPrice: json['hourlyPrice']);
+
+    return parking;
   }
 
   Map<String, dynamic> toJson() =>

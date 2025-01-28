@@ -4,6 +4,7 @@ Widget parkingFormEditTextField({
   required String label,
   required String? initialValue,
   required Function(String) onChanged,
+  required Function(String?) onSaved,
 }) {
   return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -14,5 +15,6 @@ Widget parkingFormEditTextField({
         ),
         initialValue: initialValue,
         onChanged: onChanged,
+        onSaved: onSaved,
       ));
 }

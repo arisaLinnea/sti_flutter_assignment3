@@ -1,3 +1,4 @@
+import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:shared_client/src/extensions/date_extension.dart';
 import 'package:shared_client/src/models/identifiable.dart';
 import 'package:shared_client/src/models/parkinglot.dart';
@@ -5,7 +6,7 @@ import 'package:shared_client/src/models/vehicle.dart';
 import 'package:uuid/uuid.dart';
 
 class Parking implements Identifiable {
-  String _id;
+  final String _id;
   Vehicle? vehicle;
   ParkingLot? parkinglot;
   DateTime startTime;
@@ -24,23 +25,22 @@ class Parking implements Identifiable {
 
   bool get isActive => endTime == null || endTime!.isAfter(DateTime.now());
 
-  factory Parking.fromJson(Map<String, dynamic> json) {
+  static Future<Parking> fromJsonAsync(Map<String, dynamic> json) async {
     return Parking(
         id: json['id'],
-        vehicle:
-            json['vehicle'] != null ? Vehicle.fromJson(json['vehicle']) : null,
-        parkinglot: json['parkinglot'] != null
-            ? ParkingLot.fromJson(json['parkinglot'])
-            : null,
         startTime: DateTime.parse(json['startTime']),
         endTime:
-            json['endTime'] != null ? DateTime.parse(json['endTime']) : null);
+            json['endTime'] != null ? DateTime.parse(json['endTime']) : null,
+        vehicle:
+            await VehicleRepository().getElementById(id: json['vehicleId']),
+        parkinglot: await ParkingLotRepository()
+            .getElementById(id: json['parkinglotId']));
   }
 
   Map<String, dynamic> toJson() => {
         'id': _id,
-        'vehicle': vehicle?.toJson(),
-        'parkinglot': parkinglot?.toJson(),
+        'vehicleId': vehicle?.id,
+        'parkinglotId': parkinglot?.id,
         'startTime':
             startTime.toIso8601String(), // Convert DateTime to ISO 8601 string,
         'endTime': endTime?.toIso8601String()

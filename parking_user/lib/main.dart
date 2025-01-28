@@ -21,25 +21,6 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  /*
-MultiRepositoryProvider(
-        providers: [
-          RepositoryProvider<ItemRepository>(
-              create: (context) => ItemRepository()),
-          RepositoryProvider<AuthRepository>(
-              create: (context) => AuthRepository()),
-          RepositoryProvider<UserRepository>(
-              create: (context) => UserRepository()),
-        ],
-        child: BlocProvider(
-            create: (context) => AuthBloc(
-                authRepository: context.read<AuthRepository>(),
-                userRepository: context.read<UserRepository>())
-              ..add(AuthUserSubscriptionRequested()),
-            child: const MyApp())),
-  );
-  */
   runApp(MultiRepositoryProvider(
       providers: [
         RepositoryProvider<UserLoginRepository>(
@@ -54,21 +35,12 @@ MultiRepositoryProvider(
             BlocProvider(
                 create: (context) => AuthBloc(
                     userLoginRepository: context.read<UserLoginRepository>(),
-                    ownerRepository: context.read<OwnerRepository>())),
+                    ownerRepository: context.read<OwnerRepository>())
+                  ..add(AuthUserSubscription())),
             BlocProvider(
                 create: (context) => UserRegBloc(
                     userLoginRepository: context.read<UserLoginRepository>(),
                     ownerRepository: context.read<OwnerRepository>())),
-            // BlocProvider(
-            //     create: (context) => VehicleBloc(
-            //         vehicleRepository: VehicleRepository(),
-            //         authBloc: context.read<AuthBloc>())),
-            // BlocProvider(
-            //     create: (context) => ParkingLotBloc(
-            //         parkingLotRepository: ParkingLotRepository())),
-            // BlocProvider(
-            //     create: (context) =>
-            //         ParkingBloc(parkingRepository: ParkingRepository())),
           ],
           child: ChangeNotifierProvider<ThemeNotifier>(
             create: (_) => ThemeNotifier(),
@@ -111,7 +83,6 @@ class AuthViewSwitcher extends StatelessWidget {
       },
       child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
-          print('In main user, state: $state');
           if (state is AuthAuthenticatedState) {
             return const UserView();
           } else {
@@ -133,44 +104,51 @@ class UserView extends StatefulWidget {
 class _UserViewState extends State<UserView> {
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    return MultiRepositoryProvider(
         providers: [
-          BlocProvider(
-              create: (context) => VehicleBloc(
-                  vehicleRepository: VehicleRepository(),
-                  authBloc: context.read<AuthBloc>())),
-          BlocProvider(
-              create: (context) =>
-                  ParkingLotBloc(parkingLotRepository: ParkingLotRepository())),
-          BlocProvider(
-              create: (context) =>
-                  ParkingBloc(parkingRepository: ParkingRepository())),
+          RepositoryProvider<VehicleRepository>(
+            create: (context) => VehicleRepository(),
+          ),
+          RepositoryProvider<ParkingLotRepository>(
+            create: (context) => ParkingLotRepository(),
+          ),
+          RepositoryProvider<ParkingRepository>(
+            create: (context) => ParkingRepository(),
+          ),
         ],
-        child: Consumer<ThemeNotifier>(
-          builder: (context, themeNotifier, child) {
-            return MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              routerConfig: router,
-              title: 'Find Me A Spot',
-              theme: lightTheme,
-              darkTheme: darkTheme,
-              themeMode: themeNotifier.themeMode,
-            );
-          },
-        ));
+        child: MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                  create: (context) => VehicleBloc(
+                      vehicleRepository: context.read<VehicleRepository>(),
+                      authBloc: context.read<AuthBloc>())
+                    ..add(SubscribeToUserVehicles(
+                        userId: (context.read<AuthBloc>().state
+                                as AuthAuthenticatedState)
+                            .user
+                            .id))),
+              BlocProvider(
+                  create: (context) => ParkingLotBloc(
+                      parkingLotRepository:
+                          context.read<ParkingLotRepository>(),
+                      parkingRepository: context.read<ParkingRepository>())
+                    ..add(SubscribeToParkingLots())),
+              BlocProvider(
+                  create: (context) =>
+                      ParkingBloc(parkingRepository: ParkingRepository())
+                        ..add(SubscribeToParkings())),
+            ],
+            child: Consumer<ThemeNotifier>(
+              builder: (context, themeNotifier, child) {
+                return MaterialApp.router(
+                  debugShowCheckedModeBanner: false,
+                  routerConfig: router,
+                  title: 'Find Me A Spot',
+                  theme: lightTheme,
+                  darkTheme: darkTheme,
+                  themeMode: themeNotifier.themeMode,
+                );
+              },
+            )));
   }
-  // Widget build(BuildContext context) {
-  //   return Consumer<ThemeNotifier>(
-  //     builder: (context, themeNotifier, child) {
-  //       return MaterialApp.router(
-  //         debugShowCheckedModeBanner: false,
-  //         routerConfig: router,
-  //         title: 'Find Me A Spot',
-  //         theme: lightTheme,
-  //         darkTheme: darkTheme,
-  //         themeMode: themeNotifier.themeMode,
-  //       );
-  //     },
-  //   );
-  // }
 }

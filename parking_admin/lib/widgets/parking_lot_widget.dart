@@ -22,7 +22,7 @@ class ParkingLotWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(item.address.toString()),
-              Text('Price per hour: ${item.hourlyPrice}'),
+              Text('Price per hour: ${item.hourlyPrice.toStringAsFixed(1)}'),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[

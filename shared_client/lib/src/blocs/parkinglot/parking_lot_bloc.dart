@@ -8,9 +8,11 @@ part 'parking_lot_state.dart';
 
 class ParkingLotBloc extends Bloc<ParkingLotEvent, ParkingLotState> {
   final ParkingLotRepository parkingLotRepository;
+  final ParkingRepository parkingRepository;
   List<ParkingLot> _parkingsLots = [];
 
-  ParkingLotBloc({required this.parkingLotRepository})
+  ParkingLotBloc(
+      {required this.parkingLotRepository, required this.parkingRepository})
       : super(ParkingLotInitial()) {
     on<ParkingLotEvent>((event, emit) async {
       try {
@@ -22,6 +24,15 @@ class ParkingLotBloc extends Bloc<ParkingLotEvent, ParkingLotState> {
           await _handleAddParkingLot(event, emit);
         } else if (event is EditParkingLotEvent) {
           await _handleEditParkingLot(event, emit);
+        } else if (event is SubscribeToParkingLots) {
+          return emit.onEach(
+            parkingLotRepository.parkingLotStream(),
+            onData: (parkinglots) {
+              emit(ParkingLotLoading());
+              _parkingsLots = parkinglots;
+              return emit(ParkingLotLoaded(parkingLots: parkinglots));
+            },
+          );
         }
       } catch (e) {
         emit(ParkingLotFailure(e.toString()));
@@ -31,8 +42,8 @@ class ParkingLotBloc extends Bloc<ParkingLotEvent, ParkingLotState> {
 
   Future<void> _handleLoadParkingLots(Emitter<ParkingLotState> emit) async {
     emit(ParkingLotLoading());
-    _parkingsLots = await parkingLotRepository.getList();
-    emit(ParkingLotLoaded(parkingLots: _parkingsLots));
+    List<ParkingLot> parkingsLots = await parkingLotRepository.getList();
+    emit(ParkingLotLoaded(parkingLots: parkingsLots));
   }
 
   Future<void> _handleRemoveParkingLot(

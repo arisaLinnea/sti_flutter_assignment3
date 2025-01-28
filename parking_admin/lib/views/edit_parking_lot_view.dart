@@ -27,6 +27,7 @@ class _ParkingLotViewState extends State<EditParkingLotView> {
     super.initState();
     parkingLot =
         context.read<ParkingLotBloc>().getParkingLotById(id: widget.lotId);
+    print('ParkingLot: $parkingLot');
   }
 
   @override
@@ -68,6 +69,9 @@ class _ParkingLotViewState extends State<EditParkingLotView> {
                                           setState(() {
                                             street = value;
                                           });
+                                        },
+                                        onSaved: (value) {
+                                          street = value;
                                         }),
                                     parkingFormEditTextField(
                                         label: 'ZipCode',
@@ -77,6 +81,9 @@ class _ParkingLotViewState extends State<EditParkingLotView> {
                                           setState(() {
                                             zipcode = value;
                                           });
+                                        },
+                                        onSaved: (value) {
+                                          zipcode = value;
                                         }),
                                     parkingFormEditTextField(
                                         label: 'City',
@@ -85,6 +92,9 @@ class _ParkingLotViewState extends State<EditParkingLotView> {
                                           setState(() {
                                             city = value;
                                           });
+                                        },
+                                        onSaved: (value) {
+                                          city = value;
                                         }),
                                     Column(
                                       mainAxisAlignment:
@@ -147,8 +157,10 @@ class _ParkingLotViewState extends State<EditParkingLotView> {
                                                                 zipCode:
                                                                     zipcode!,
                                                                 city: city!),
-                                                            hourlyPrice:
-                                                                price!);
+                                                            hourlyPrice: price ??
+                                                                parkingLot!
+                                                                    .hourlyPrice);
+
                                                     context
                                                         .read<ParkingLotBloc>()
                                                         .add(

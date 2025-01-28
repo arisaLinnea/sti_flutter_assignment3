@@ -1,9 +1,8 @@
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:parking_user/utils/utils.dart';
 import 'package:shared_client/shared_client.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -20,6 +19,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await _handleLoginToState(event, emit);
         } else if (event is AuthLogoutEvent) {
           await _handleLogoutToState(emit);
+        } else if (event is AuthUserSubscription) {
+          return emit.onEach(userLoginRepository.userStream,
+              onData: (authUser) async {
+            if (authUser != null) {
+              Owner newUser =
+                  await ownerRepository.getElementByAuthId(id: authUser.uid);
+              return emit(AuthAuthenticatedState(newUser: newUser));
+            } else {
+              return emit(AuthUnauthorizedState());
+            }
+          });
         }
       } catch (e) {
         if (e is FirebaseAuthException) {
@@ -37,21 +47,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       AuthLoginEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingState());
 
-    print('Before repo call in bloc');
-    final authUser = await userLoginRepository.login(
-        userName: event.userName, pwd: event.pwd);
-    User? user = userLoginRepository.getCurrentUser();
-
-    Owner owner = await ownerRepository.getElementByAuthId(id: user!.uid);
-
-    print('After repo call in bloc');
-    emit(AuthAuthenticatedState(newUser: owner));
-    print('Sent AuthAuthenticatedState');
+    await userLoginRepository.login(userName: event.userName, pwd: event.pwd);
   }
 
   Future<void> _handleLogoutToState(Emitter<AuthState> emit) async {
     await userLoginRepository.logout();
-    print('Logout');
-    emit(AuthUnauthorizedState());
   }
 }

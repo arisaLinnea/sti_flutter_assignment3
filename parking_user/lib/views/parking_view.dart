@@ -19,7 +19,7 @@ class _ParkingViewState extends State<ParkingView> {
     super.initState();
     owner = context.read<AuthBloc>().state.user;
     context.read<ParkingBloc>().add(LoadParkingsEvent());
-    context.read<ParkingLotBloc>().add(LoadParkingLotsEvent());
+    //context.read<ParkingLotBloc>().add(LoadParkingLotsEvent());
   }
 
   @override
@@ -36,64 +36,49 @@ class _ParkingViewState extends State<ParkingView> {
               ),
             ),
           ),
-          BlocListener<ParkingBloc, ParkingState>(
-            listener: (context, parkingState) {
-              if (parkingState is ParkingFailure) {
-                Utils.toastMessage(parkingState.error);
-              }
-              if (parkingState is ParkingSuccess) {
-                Utils.toastMessage(parkingState.message);
-              }
-              if (parkingState is ParkingLoaded) {
-                context.read<ParkingLotBloc>().add(LoadParkingLotsEvent());
-              }
-            },
-            child: BlocBuilder<ParkingLotBloc, ParkingLotState>(
-              builder: (context, lotState) {
-                final parkingState = context.read<ParkingBloc>().state;
-                if (lotState is ParkingLotLoading ||
-                    parkingState is ParkingLoading) {
-                  return const SliverToBoxAdapter(
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                if (parkingState is! ParkingLoaded &&
-                    parkingState is! ParkingLoading) {
-                  return const SliverToBoxAdapter(
-                    child: Center(
-                        child:
-                            Text('Could not fetch available parkingspaces.')),
-                  );
-                }
-
-                if (lotState is ParkingLotLoaded) {
-                  List<ParkingLot> freeParkingLots = context
-                      .read<ParkingLotBloc>()
-                      .getFreeParkingLots(
-                          allParkings:
-                              (parkingState as ParkingLoaded).parkings);
-
-                  if (freeParkingLots.isEmpty) {
-                    return const SliverToBoxAdapter(
-                      child: Center(child: Text('No parkinglots available.')),
-                    );
-                  }
-
-                  return SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return FreeLotsWidget(
-                            item: freeParkingLots[index], number: index + 1);
-                      },
-                      childCount: freeParkingLots.length,
-                    ),
-                  );
-                }
+          BlocBuilder<ParkingLotBloc, ParkingLotState>(
+            builder: (context, lotState) {
+              final parkingState = context.read<ParkingBloc>().state;
+              if (lotState is ParkingLotLoading ||
+                  parkingState is ParkingLoading) {
                 return const SliverToBoxAdapter(
-                  child: Center(child: Text('Error loading parking lots.')),
+                  child: Center(child: CircularProgressIndicator()),
                 );
-              },
-            ),
+              }
+              if (parkingState is! ParkingLoaded &&
+                  parkingState is! ParkingLoading) {
+                return const SliverToBoxAdapter(
+                  child: Center(
+                      child: Text('Could not fetch available parkingspaces.')),
+                );
+              }
+
+              if (lotState is ParkingLotLoaded) {
+                List<ParkingLot> freeParkingLots = context
+                    .read<ParkingLotBloc>()
+                    .getFreeParkingLots(
+                        allParkings: (parkingState as ParkingLoaded).parkings);
+
+                if (freeParkingLots.isEmpty) {
+                  return const SliverToBoxAdapter(
+                    child: Center(child: Text('No parkinglots available.')),
+                  );
+                }
+
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return FreeLotsWidget(
+                          item: freeParkingLots[index], number: index + 1);
+                    },
+                    childCount: freeParkingLots.length,
+                  ),
+                );
+              }
+              return const SliverToBoxAdapter(
+                child: Center(child: Text('Error loading parking lots.')),
+              );
+            },
           ),
           const SliverToBoxAdapter(
             child: Padding(
@@ -104,7 +89,18 @@ class _ParkingViewState extends State<ParkingView> {
               ),
             ),
           ),
-          BlocBuilder<ParkingBloc, ParkingState>(
+          BlocListener<ParkingBloc, ParkingState>(
+              listener: (context, parkingState) {
+            if (parkingState is ParkingFailure) {
+              Utils.toastMessage(parkingState.error);
+            }
+            if (parkingState is ParkingSuccess) {
+              Utils.toastMessage(parkingState.message);
+            }
+            if (parkingState is ParkingLoaded) {
+              context.read<ParkingLotBloc>().add(LoadParkingLotsEvent());
+            }
+          }, child: BlocBuilder<ParkingBloc, ParkingState>(
             builder: (context, parkState) {
               if (parkState is ParkingLoading) {
                 return const SliverToBoxAdapter(
@@ -139,7 +135,7 @@ class _ParkingViewState extends State<ParkingView> {
                 child: Center(child: Text('Error loading active parkings.')),
               );
             },
-          ),
+          )),
           const SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.all(16.0),

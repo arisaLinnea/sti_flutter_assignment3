@@ -23,11 +23,14 @@ Future<void> main() async {
       providers: [
         BlocProvider(create: (context) => AuthBloc()),
         BlocProvider(
-            create: (context) =>
-                ParkingLotBloc(parkingLotRepository: ParkingLotRepository())),
+            create: (context) => ParkingLotBloc(
+                parkingLotRepository: ParkingLotRepository(),
+                parkingRepository: ParkingRepository())
+              ..add(SubscribeToParkingLots())),
         BlocProvider(
             create: (context) =>
-                ParkingBloc(parkingRepository: ParkingRepository())),
+                ParkingBloc(parkingRepository: ParkingRepository())
+                  ..add(SubscribeToParkings())),
       ],
       child: ChangeNotifierProvider<ThemeNotifier>(
         create: (_) => ThemeNotifier(),

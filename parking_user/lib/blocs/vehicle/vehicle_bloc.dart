@@ -24,6 +24,12 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
           await _handleLoadVehicle(emit, user);
         } else if (event is EditVehicleEvent) {
           await _handleEditVehicle(event, emit, user);
+        } else if (event is SubscribeToUserVehicles) {
+          final userId = event.userId;
+          await emit.onEach(vehicleRepository.userVehicleStream(userId),
+              onData: (vehicles) {
+            emit(VehicleLoaded(vehicles: vehicles));
+          });
         }
       } catch (e) {
         emit(VehicleFailure(e.toString()));

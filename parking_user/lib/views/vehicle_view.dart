@@ -14,12 +14,6 @@ class VehicleView extends StatefulWidget {
 
 class _VehicleViewState extends State<VehicleView> {
   @override
-  void initState() {
-    super.initState();
-    context.read<VehicleBloc>().add(LoadVehiclesEvent());
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('My vehicles')),

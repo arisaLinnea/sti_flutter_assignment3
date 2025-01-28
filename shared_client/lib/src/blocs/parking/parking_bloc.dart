@@ -21,6 +21,15 @@ class ParkingBloc extends Bloc<ParkingEvent, ParkingState> {
           await _handleAddParking(event, emit);
         } else if (event is EditParkingEvent) {
           await _handleEditParking(event, emit);
+        } else if (event is SubscribeToParkings) {
+          return emit.onEach(
+            parkingRepository.parkingStream(),
+            onData: (parkings) {
+              emit(ParkingLoading());
+              _parkings = parkings;
+              return emit(ParkingLoaded(parkings: parkings));
+            },
+          );
         }
       } catch (e) {
         emit(ParkingFailure(e.toString()));

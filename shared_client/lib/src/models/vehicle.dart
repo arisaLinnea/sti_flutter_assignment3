@@ -1,10 +1,11 @@
+import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:shared_client/src/enums/car_type.dart';
 import 'package:shared_client/src/models/identifiable.dart';
 import 'package:shared_client/src/models/owner.dart';
 import 'package:uuid/uuid.dart';
 
 class Vehicle implements Identifiable {
-  String _id;
+  final String _id;
   String registrationNo;
   CarBrand type;
   Owner? owner;
@@ -19,23 +20,21 @@ class Vehicle implements Identifiable {
   @override
   String get id => _id;
 
-  factory Vehicle.fromJson(Map<String, dynamic> json) {
+  static Future<Vehicle> fromJsonAsync(Map<String, dynamic> json) async {
     var typeIndex = json['type'];
-
-    Vehicle vehicle = Vehicle(
+    return Vehicle(
       id: json['id'],
       registrationNo: json['registrationNo'],
       type: CarBrand.values[typeIndex],
-      owner: json['owner'] != null ? Owner.fromJson(json['owner']) : null,
+      owner: await OwnerRepository().getElementById(id: json['ownerId']),
     );
-    return vehicle;
   }
 
   Map<String, dynamic> toJson() => {
         'id': _id,
         'registrationNo': registrationNo,
         'type': type.index,
-        'owner': owner?.toJson()
+        'ownerId': owner?.id
       };
 
   @override

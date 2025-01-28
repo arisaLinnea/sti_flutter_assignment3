@@ -22,7 +22,8 @@ class OwnerRepository extends Repository<Owner> {
   }
 
   @override
-  Owner deserialize(Map<String, dynamic> json) => Owner.fromJson(json);
+  Future<Owner> deserialize(Map<String, dynamic> json) async =>
+      Owner.fromJson(json);
 
   @override
   Map<String, dynamic> serialize(Owner item) => item.toJson();

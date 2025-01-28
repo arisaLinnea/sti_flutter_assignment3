@@ -21,7 +21,7 @@ class FreeLotsWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text('Address: ${item.address.toString()}'),
-              Text('Hourly price: ${item.hourlyPrice}'),
+              Text('Hourly price: ${item.hourlyPrice.toStringAsFixed(1)}'),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[

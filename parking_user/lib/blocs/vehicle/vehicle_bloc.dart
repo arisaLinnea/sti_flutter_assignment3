@@ -64,8 +64,12 @@ class VehicleBloc extends Bloc<VehicleEvent, VehicleState> {
     emit(VehicleLoading());
     String? vehicleid = await vehicleRepository.addToList(item: event.vehicle);
 
-    emit(VehicleSuccess('Vehicle added successfully'));
-    await _handleLoadVehicle(emit, owner);
+    if (vehicleid != null) {
+      emit(VehicleSuccess('Vehicle added successfully'));
+      await _handleLoadVehicle(emit, owner);
+    } else {
+      emit(VehicleFailure('Failed to add vehicle'));
+    }
   }
 
   Future<void> _handleEditVehicle(

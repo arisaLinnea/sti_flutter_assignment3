@@ -34,7 +34,6 @@ class UserRegBloc extends Bloc<UserRegEvent, UserRegState> {
       final userCredential = await userLoginRepository.registerAccount(
           userName: event.username, pwd: event.password);
       User? authUser = userLoginRepository.getCurrentUser();
-
       if (authUser != null) {
         Owner newOwner =
             Owner(name: event.name, ssn: event.ssn, loginId: authUser.uid);
@@ -42,26 +41,16 @@ class UserRegBloc extends Bloc<UserRegEvent, UserRegState> {
         if (response != null) {
           emit(AuthRegistrationState());
         } else {
+          userLoginRepository.deleteAccount();
           emit(UserRegFailedState(message: 'Failed to add account'));
         }
       }
     } catch (e) {
-      // emit(UserRegFailedState(message: 'Failed to add account'));
-      Utils.toastMessage(e.toString());
+      emit(UserRegFailedState(
+          message: 'Failed to add account: ${e.toString()}'));
     } finally {
       // only want to register the account, not login the user
       await userLoginRepository.logout();
     }
-
-    // Owner newOwner = Owner(name: event.name, ssn: event.ssn);
-    // String? uuid = await ownerRepository.addToList(item: newOwner);
-    // UserLogin newLoginUser =
-    //     UserLogin(ownerId: uuid, userName: event.username, pwd: event.password);
-    // String? response = await userLoginRepository.addToList(item: newLoginUser);
-    // if (response != null) {
-    //   emit(AuthRegistrationState());
-    // } else {
-    //   emit(UserRegFailedState(message: 'Failed to add account'));
-    // }
   }
 }

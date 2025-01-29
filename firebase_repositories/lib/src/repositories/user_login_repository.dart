@@ -9,6 +9,10 @@ class UserLoginRepository {
         email: userName, password: pwd);
   }
 
+  Future<void> deleteAccount() {
+    return firebaseAuth.currentUser!.delete();
+  }
+
   User? getCurrentUser() {
     return firebaseAuth.currentUser;
   }

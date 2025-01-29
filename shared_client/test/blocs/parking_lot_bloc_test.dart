@@ -1,22 +1,27 @@
+import 'package:bloc_test/bloc_test.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:bloc_test/bloc_test.dart';
 import 'package:shared_client/shared_client.dart';
 
 import '../mock_data.dart';
 
 class MockParkingLotRepo extends Mock implements ParkingLotRepository {}
 
+class MockParkingRepo extends Mock implements ParkingRepository {}
+
 void main() {
   late ParkingLotBloc parkingLotBloc;
   late MockParkingLotRepo mockParkingLotRepository;
+  late MockParkingRepo mockParkingRepository;
 
   setUp(() {
     mockParkingLotRepository = MockParkingLotRepo();
+    mockParkingRepository = MockParkingRepo();
 
     parkingLotBloc = ParkingLotBloc(
       parkingLotRepository: mockParkingLotRepository,
+      parkingRepository: mockParkingRepository,
     );
   });
 

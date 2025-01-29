@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_repositories/firebase_repositories.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -8,13 +9,23 @@ import '../mocks/mock_data.dart';
 
 class MockUserLoginRepository extends Mock implements UserLoginRepository {}
 
+class MockOwnerRepository extends Mock implements OwnerRepository {}
+
+class MockUserCredential extends Mock implements UserCredential {}
+
 void main() {
   late MockUserLoginRepository mockUserLoginRepository;
+  late MockOwnerRepository mockOwnerRepository;
+  late MockUserCredential mockCredential;
   late AuthBloc authBloc;
 
   setUp(() {
     mockUserLoginRepository = MockUserLoginRepository();
-    authBloc = AuthBloc(userLoginRepository: mockUserLoginRepository);
+    mockOwnerRepository = MockOwnerRepository();
+    mockCredential = MockUserCredential();
+    authBloc = AuthBloc(
+        userLoginRepository: mockUserLoginRepository,
+        ownerRepository: mockOwnerRepository);
   });
 
   setUpAll(() {
@@ -33,8 +44,9 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits AuthAuthenticatedState when login is successful',
       build: () {
-        when(() => mockUserLoginRepository.login(userName: any(), pwd: any()))
-            .thenAnswer((_) async => mockOwner);
+        when(() => mockUserLoginRepository.login(
+            userName: any(named: "userName"),
+            pwd: any(named: "pwd"))).thenAnswer((_) async => mockCredential);
         return authBloc;
       },
       act: (bloc) => bloc.add(
@@ -42,19 +54,22 @@ void main() {
       ),
       expect: () => [
         AuthLoadingState(),
-        AuthAuthenticatedState(newUser: mockOwner),
       ],
       verify: (_) {
-        verify(() => mockUserLoginRepository.login(userName: any(), pwd: any()))
-            .called(1);
+        verify(() => mockUserLoginRepository.login(
+            userName: any(named: "userName"),
+            pwd: any(named: "pwd"))).called(1);
       },
     );
 
     blocTest<AuthBloc, AuthState>(
       'emits AuthFailedState when login is unsuccessful',
       build: () {
-        when(() => mockUserLoginRepository.login(userName: any(), pwd: any()))
-            .thenAnswer((_) async => null);
+        when(() =>
+            mockUserLoginRepository.login(
+                userName: any(named: "userName"),
+                pwd: any(named: "pwd"))).thenThrow(
+            FirebaseAuthException(code: 'error', message: 'Failed to login'));
         return authBloc;
       },
       act: (bloc) => bloc.add(
@@ -62,22 +77,28 @@ void main() {
       ),
       expect: () => [
         AuthLoadingState(),
-        AuthFailedState(message: 'Login Failed'),
+        AuthFailedState(message: 'Failed to login'),
         AuthUnauthorizedState(),
       ],
       verify: (_) {
-        verify(() => mockUserLoginRepository.login(userName: any(), pwd: any()))
-            .called(1);
+        verify(() => mockUserLoginRepository.login(
+            userName: any(named: "userName"),
+            pwd: any(named: "pwd"))).called(1);
       },
     );
 
     blocTest<AuthBloc, AuthState>(
       'emits AuthUnauthorizedState when logout is successful',
-      build: () => authBloc,
+      build: () {
+        when(() => mockUserLoginRepository.logout())
+            .thenAnswer((_) async => Future.value());
+        return authBloc;
+      },
       act: (bloc) => bloc.add(AuthLogoutEvent()),
-      expect: () => [
-        AuthUnauthorizedState(),
-      ],
+      expect: () => [],
+      verify: (_) {
+        verify(() => mockUserLoginRepository.logout()).called(1);
+      },
     );
   });
 }

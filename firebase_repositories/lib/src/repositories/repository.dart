@@ -29,7 +29,7 @@ abstract class Repository<T extends Identifiable> {
     return items;
   }
 
-  Future<T> getElementById({required String id}) async {
+  Future<T?> getElementById({required String id}) async {
     final snapshot = await db.collection(_path).doc(id).get();
     final json = snapshot.data();
 

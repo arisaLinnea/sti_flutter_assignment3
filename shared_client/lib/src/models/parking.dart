@@ -31,10 +31,13 @@ class Parking implements Identifiable {
         startTime: DateTime.parse(json['startTime']),
         endTime:
             json['endTime'] != null ? DateTime.parse(json['endTime']) : null,
-        vehicle:
-            await VehicleRepository().getElementById(id: json['vehicleId']),
-        parkinglot: await ParkingLotRepository()
-            .getElementById(id: json['parkinglotId']));
+        vehicle: json['vehicleId'] != null
+            ? await VehicleRepository().getElementById(id: json['vehicleId'])
+            : null,
+        parkinglot: json['parkinglotId'] != null
+            ? await ParkingLotRepository()
+                .getElementById(id: json['parkinglotId'])
+            : null);
   }
 
   Map<String, dynamic> toJson() => {

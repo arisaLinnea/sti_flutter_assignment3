@@ -52,13 +52,11 @@ class _ParkingViewState extends State<ParkingView> {
                       child: Text('Could not fetch available parkingspaces.')),
                 );
               }
-
               if (lotState is ParkingLotLoaded) {
                 List<ParkingLot> freeParkingLots = context
                     .read<ParkingLotBloc>()
                     .getFreeParkingLots(
                         allParkings: (parkingState as ParkingLoaded).parkings);
-
                 if (freeParkingLots.isEmpty) {
                   return const SliverToBoxAdapter(
                     child: Center(child: Text('No parkinglots available.')),

@@ -83,8 +83,11 @@ class ParkingLot implements Identifiable {
         ? await Address.fromJsonAsync(json['address'])
         : null;
 
-    ParkingLot parking = ParkingLot(
-        id: json['id'], address: address, hourlyPrice: json['hourlyPrice']);
+    double hourlyPrice = json['hourlyPrice'] is int
+        ? json['hourlyPrice'].roundToDouble()
+        : json['hourlyPrice'];
+    ParkingLot parking =
+        ParkingLot(id: json['id'], address: address, hourlyPrice: hourlyPrice);
 
     return parking;
   }

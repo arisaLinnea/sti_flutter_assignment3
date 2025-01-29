@@ -60,5 +60,5 @@ New features
 # 3. Known limitations
 
 - (\*) Have implemented some realtime updates, but only on first level. For example if the price of a parking lot is changed, it will (hopefully) update the parking lot list, however a parking that contains a parking lot will not be effected.
-- The applications handles the price of the parking lots even if you set an integer. But if you change the price to an integer in the database directly the applications will fail when trying to fetch it.
+- Better hanling of removing objects that is being used elsewhere. For example if you remove a parking lot but someone has a parking there. Might be a good idea to add a check that you can't remove a parking lot in an active parking. (But since you also want to display ended parking, there might be hard to find a solution that works for every situation)
 - Lacks some responsive features
